@@ -3,7 +3,8 @@ import os, sys, shutil
 
 GAME_WWW = "../www"
 MOD_WWW = "./www"
-REPLACE_EXTENSIONS = [".png", ".ogg"]
+REPLACE_EXTENSIONS = [".png", ".ogg", ".js", ".json"]
+ENCRYPTED_EXTENSIONS = [".png", ".ogg"]
 
 HEADER_LENGTH = 16
 SIGNATURE = "5250474D56000000"
@@ -24,8 +25,11 @@ def patch():
 			if ext in REPLACE_EXTENSIONS:
 				new = os.path.join(root, filename)
 				old = new.replace(MOD_WWW, GAME_WWW)
-				old = old.replace(ext, ".rpgmvp")
-				replace_file(old, new)
+				if ext in ENCRYPTED_EXTENSIONS:
+					old = old.replace(ext, ".rpgmvp")
+					replace_file(old, new, True)
+				else:
+					replace_file(old, new, False)
 
 def unpatch():
 	print("Unpatching...")
@@ -59,7 +63,7 @@ def decrypt(filename, output, encrypt=False):
 	dec_file.write(dec_data)
 	dec_file.close()
 
-def replace_file(old, new):
+def replace_file(old, new, needToEncrypt):
 	print("Replace '%s' with '%s'" % (old, new))
 
 	if not os.path.exists(old):
@@ -73,9 +77,11 @@ def replace_file(old, new):
 	backup_file = old + ".backup"
 	if not os.path.exists(backup_file):
 		shutil.copy(old, backup_file)
-
-	# Replace it with the encoded mod file, assume its a png for now
-	decrypt(new, old, True)
+	
+	if needToEncrypt:
+		decrypt(new, old, True)
+	else:
+		shutil.copy(new, old)
 
 if __name__ == "__main__":
 	cmd = "patch"
