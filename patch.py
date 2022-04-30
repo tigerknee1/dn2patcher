@@ -3,6 +3,7 @@ import os, sys, shutil
 
 GAME_WWW = "../www"
 MOD_WWW = "./www"
+DUMP_WWW = "../dump"
 REPLACE_EXTENSIONS = [".png", ".ogg", ".js", ".json"]
 ENCRYPTED_EXTENSIONS = [".png", ".ogg"]
 
@@ -16,6 +17,7 @@ def usage():
 	print("Usage:")
 	print("  patch.py")
 	print("  patch.py unpatch")
+	print("  patch.py dump")
 
 def patch():
 	print("Patching...")
@@ -44,10 +46,29 @@ def unpatch():
 				shutil.copy(backup, patched)
 				os.remove(backup)
 
+def dump():
+	print("Dumping...")
+	dump_folder("img", ".rpgmvp", ".png")
+	dump_folder("audio", ".rpgmvo", ".ogg")
+
+def dump_folder(base_folder, from_ext, to_ext):
+	for root, subdirs, files, in os.walk(os.path.join(GAME_WWW, base_folder)):
+		folder = root.replace(GAME_WWW, DUMP_WWW)
+		if not os.path.isdir(folder):
+			print("Creating folder %s" % folder)
+			os.mkdir(folder)
+		for filename in files:
+			filepath = os.path.join(root, filename)
+			output = filename.replace(from_ext, to_ext)
+			output = os.path.join(folder, output)
+			print("Dumping %s to %s" % (filepath, output))
+			decrypt(filepath, output)
+
+
 def decrypt(filename, output, encrypt=False):
 	dec_data = bytearray(open(filename, "rb").read())
 	if not encrypt:
-		dec_data = enc_data[16:]
+		dec_data = dec_data[16:]
 
 	for i in range(0, HEADER_LENGTH):
 		dec_data[i] ^= ENC_KEY[i]
@@ -92,6 +113,8 @@ if __name__ == "__main__":
 		patch()
 	elif cmd == "unpatch":
 		unpatch()
+	elif cmd == "dump":
+		dump()
 	else:
 		usage()
 
