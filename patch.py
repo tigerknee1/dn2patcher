@@ -48,6 +48,8 @@ def unpatch():
 
 def dump():
 	print("Dumping...")
+	if not os.path.isdir(DUMP_WWW):
+		os.mkdir(DUMP_WWW)
 	dump_folder("img", ".rpgmvp", ".png")
 	dump_folder("audio", ".rpgmvo", ".ogg")
 
