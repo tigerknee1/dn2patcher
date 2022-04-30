@@ -16,4 +16,6 @@ To restore the original files you can run...
     patch.py unpatch
 
 # How to decode the files in the first place
-You can use this script to decode and dump all the game files https://gist.github.com/requiredinformation/9692650768c7193b92a1325f46fc9613
+You can run the following to dump all the images / sounds into a folder called dump
+
+    patch.py dump
