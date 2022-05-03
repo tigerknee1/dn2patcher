@@ -1,6 +1,15 @@
 # dn2patcher
 A simple modding tool for Didnapper 2. It replaces the game files with ones found in www/* and backs up the original ones. You just need python to run it.
 
+By default this repo includes so tweeks to the escape system:
+- Combo system (the higher the combo the faster you escape)
+- Auto-stuggle feature (toggle with A)
+- Different button sprite
+- Relax button for reducing the distraction guage
+- Displays the escape exp next to the level
+
+If you don't want these remove the contents of www/
+
 # How to use
 Clone this repository into Didnapper 2's root folder.
 
