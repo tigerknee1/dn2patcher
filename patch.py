@@ -38,13 +38,21 @@ def unpatch():
 	for root, subdirs, files, in os.walk(GAME_WWW):
 		for filename in files:	
 			if filename.endswith(".backup"):
+				# Restore the original file and delete the backup
 				backup = os.path.join(root, filename)
 				patched = backup.replace(".backup", "")
-				
-				# Restore the original file and delete the backup
+
 				print("Restoring %s" % patched)
 				shutil.copy(backup, patched)
 				os.remove(backup)
+			elif filename.endswith(".patch"):
+				# Delete added files
+				patch_file = os.path.join(root, filename)
+				patched = patch_file.replace(".patch", "")
+
+				print("Deleting %s" % patched)
+				os.remove(patched)
+				os.remove(patch_file)
 
 def dump():
 	print("Dumping...")
@@ -87,20 +95,25 @@ def decrypt(filename, output, encrypt=False):
 	dec_file.close()
 
 def replace_file(old, new, needToEncrypt):
-	print("Replace '%s' with '%s'" % (old, new))
 
-	if not os.path.exists(old):
-		print("Original file does not exist")
-		return
 	if not os.path.exists(new):
 		print("New file does not exist")
 		return
 
-	# Only backup the original file
-	backup_file = old + ".backup"
-	if not os.path.exists(backup_file):
-		shutil.copy(old, backup_file)
-	
+	if os.path.exists(old):
+		# Only backup the original file
+		print("Replace '%s' with '%s'" % (old, new))
+		backup_file = old + ".backup"
+		if not os.path.exists(backup_file):
+			shutil.copy(old, backup_file)
+	else:	
+		# Create a .patch file to mark the file as non-original
+		print("New file '%s'" % new)
+		patch_file = old + ".patch"
+		if not os.path.exists(patch_file):
+			f = open(patch_file, "w")
+			f.close()
+
 	if needToEncrypt:
 		decrypt(new, old, True)
 	else:
